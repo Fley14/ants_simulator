@@ -11,7 +11,7 @@ nest = Ants.Nest(400,400)
 
 ants_table = []
 for i in range(100):
-    ants_table.append(Ants.Ant(400,400,(rd.random()*2-1)*math.pi,nest,rd.randint(10,50)))
+    ants_table.append(Ants.Ant(400,400,(rd.random()*2-1)*math.pi,nest,rd.randint(0,20)))
 
 
 def go():

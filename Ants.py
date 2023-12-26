@@ -27,6 +27,8 @@ class Nest:
 
 class Ant:
     rect=pygame.Rect(0,0,5,5)
+    width = 5
+    length = 5
     color = (255,255,255)
     speed = 1
     food_find =0
@@ -64,7 +66,7 @@ class Ant:
         self.direction %= 2*math.pi
     
     def show(self,screen):
-        pygame.draw.rect(screen, self.color, self.rect)
+        pygame.draw.rect(screen, self.color, (self.x,self.y,self.width,self.length))
     
     def __repr__(self):
         return f'Ant({self.x},{self.y},{self.direction},{self.nest_dir})'
