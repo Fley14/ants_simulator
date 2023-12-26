@@ -13,10 +13,13 @@ def angle(vect1,vect2):
 
 
 class Nest:
-    color = (255,0,0)
+    color = (204,102,0)
+    grow_necessity=10
     def __init__(self,x,y,nb_ant):
         self.rect=pygame.Rect(x,y,10,10)
         self.nb_ant=nb_ant
+        self.food_reserve=0
+
         self.ants_table=[]
         for i in range(nb_ant):
             self.ants_table.append(Ant(x,y,(rd.random()*2-1)*math.pi,self,rd.randint(1,50)))
@@ -24,10 +27,11 @@ class Nest:
     def show(self,screen):
         pygame.draw.rect(screen, self.color, self.rect)
         for ant in self.ants_table:
-            ant.show(screen)
-            if debug:
-                ant.trace_nest_dir(screen)
-                ant.trace_direction(screen)
+            if not ant.in_nest:
+                ant.show(screen)
+                if debug:
+                    ant.trace_nest_dir(screen)
+                    ant.trace_direction(screen)
     def move(self):
         for ant in self.ants_table:
             ant.move()
@@ -40,6 +44,23 @@ class Nest:
             if not ant.in_nest:
                 return 0
         return 1
+    
+    def contact_food(self,food_tab):
+        for ant in self.ants_table:
+            for food in food_tab:
+                if ant.rect.colliderect(food.rect) and ant.food_find==0:
+                    ant.food_find=1
+                    if food.consume():
+                        food_tab.remove(food)
+    def grow (self,add_food=0):
+        self.food_reserve+=add_food
+        if self.food_reserve>Nest.grow_necessity:
+            self.food_reserve-=Nest.grow_necessity
+            self.nb_ant+=1
+            self.ants_table.append(Ant(self.rect.x,self.rect.y,(rd.random()*2-1)*math.pi,self,rd.randint(1,50)))
+            self.rect.width+=1
+            self.rect.height+=1
+            print("nest grow!")  
     
 
 
@@ -104,4 +125,23 @@ class Ant:
         
     def contact_nest(self):
         if self.rect.colliderect(self.nest.rect) and self.food_find==1:
-            self.in_nest=1
+            self.nest.grow(1)
+            self.food_find=0
+
+class Food:
+    color = (255,50,0)
+    def __init__(self,x,y):
+        self.rect=pygame.Rect(x,y,20,20)
+    
+    def show(self,screen):
+        pygame.draw.rect(screen, self.color, self.rect)
+    
+    def __repr__(self):
+        return f'Food({self.rect.x},{self.rect.y})'
+    
+    def consume(self):
+        self.rect.width-=1
+        self.rect.height-=1
+        if self.rect.width==0:
+            return 1
+        return 0
