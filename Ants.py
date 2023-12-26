@@ -2,7 +2,7 @@ import math
 import pygame
 import random as rd
 import numpy as np
-
+debug=0
 
 def angle(vect1,vect2):
     scal=np.dot(vect1,vect2)
@@ -14,11 +14,34 @@ def angle(vect1,vect2):
 
 class Nest:
     color = (255,0,0)
-    def __init__(self,x,y):
+    def __init__(self,x,y,nb_ant):
         self.rect=pygame.Rect(x,y,10,10)
+        self.nb_ant=nb_ant
+        self.ants_table=[]
+        for i in range(nb_ant):
+            self.ants_table.append(Ant(x,y,(rd.random()*2-1)*math.pi,self,rd.randint(1,50)))
     
     def show(self,screen):
         pygame.draw.rect(screen, self.color, self.rect)
+        for ant in self.ants_table:
+            ant.show(screen)
+            if debug:
+                ant.trace_nest_dir(screen)
+                ant.trace_direction(screen)
+    def move(self):
+        for ant in self.ants_table:
+            ant.move()
+            ant.turn()
+            ant.contact_nest()
+            ant.nest_return()
+    
+    def all_ant_in_nest(self):
+        for ant in self.ants_table:
+            if not ant.in_nest:
+                return 0
+        return 1
+    
+
 
 
 class Ant:

@@ -3,37 +3,29 @@ import pygame
 import random as rd
 import math
 
-
+game_go=1
 pygame.init()
 screen = pygame.display.set_mode((800,800))
 
-nest = Ants.Nest(400,400)
+nest = Ants.Nest(400,400,100)
 
-ants_table = []
-for i in range(100):
-    ants_table.append(Ants.Ant(400,400,(rd.random()*2-1)*math.pi,nest,rd.randint(1,50)))
-
-
-def go():
-    for ant in ants_table:
-        if ant.in_nest==0:
-            ant.move()
-            ant.turn()
-            ant.show(screen)
-            ant.contact_nest()
-            ant.nest_return()
-
-
-for i in range(400):
+def actualise_go():
+    global game_go
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_go=0
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                game_go=0
+i=0
+while not nest.all_ant_in_nest() and game_go and i<1000:
     screen.fill((0,0,0))
+    i+=1
+    nest.move()
     nest.show(screen)
-    print(i)
-    go()
     pygame.display.update()
-    pygame.time.delay(50)
-    if i==100:
-        for ant in ants_table:
-            ant.food_find=1
+    pygame.time.delay(10)
+    actualise_go()
 
 
 pygame.time.delay(1000)
