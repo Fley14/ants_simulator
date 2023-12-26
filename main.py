@@ -11,7 +11,7 @@ nest = Ants.Nest(400,400)
 
 ants_table = []
 for i in range(100):
-    ants_table.append(Ants.Ant(400,400,(rd.random()*2-1)*math.pi,nest,rd.randint(0,20)))
+    ants_table.append(Ants.Ant(400,400,(rd.random()*2-1)*math.pi,nest,rd.randint(1,50)))
 
 
 def go():
@@ -20,22 +20,17 @@ def go():
             ant.move()
             ant.turn()
             ant.show(screen)
-            # ant.trace_nest_dir(screen)
-            # ant.nest_return()
-            # ant.trace_direction(screen)
             ant.contact_nest()
+            ant.nest_return()
 
 
 for i in range(400):
     screen.fill((0,0,0))
-    pygame.draw.rect(screen, (255,0,0), (400,400,5,5))
+    nest.show(screen)
     print(i)
     go()
     pygame.display.update()
     pygame.time.delay(50)
-    if i%30==0:
-        for ant in ants_table:
-            ant.nest_return()
     if i==100:
         for ant in ants_table:
             ant.food_find=1

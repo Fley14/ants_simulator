@@ -13,27 +13,20 @@ def angle(vect1,vect2):
 
 
 class Nest:
-    width = 10
-    length = 10
     color = (255,0,0)
-
     def __init__(self,x,y):
-        self.x = x
-        self.y = y
+        self.rect=pygame.Rect(x,y,10,10)
     
     def show(self,screen):
-        pygame.draw.rect(screen, self.color, (self.x,self.y,self.width,self.length))
+        pygame.draw.rect(screen, self.color, self.rect)
 
 
 class Ant:
-    rect=pygame.Rect(0,0,5,5)
     width = 5
     length = 5
     color = (255,255,255)
     speed = 1
-    food_find =0
-    in_nest=0
-    return_nest_count=0
+    
     def __init__(self,x,y,direction,nest,sense_direction):
         """
         this function initialize the ant mith a position and a direction
@@ -41,23 +34,24 @@ class Ant:
         the sens of direction is the capacity of the ant to find the nest more the number is high
           more dificult is for the ant to find the nest
         """
-        self.x = x
-        self.y = y
+        self.rect=pygame.Rect(x,y,self.width,self.length)
         self.direction = direction
         self.nest_dir=np.array([-math.cos(self.direction),-math.sin(self.direction)],float)
         self.nest_dir%=2*math.pi
         self.nest=nest
         self.sense_direction=sense_direction
-        self.rect.x=x
-        self.rect.y=y
+        self.food_find =0
+        self.in_nest=0
+        self.return_nest_count=0
+
 
     def move(self):
         if not self.in_nest:
             self.return_nest_count+=1
             addx=math.cos(self.direction)*self.speed
             addy=math.sin(self.direction)*self.speed
-            self.x += addx
-            self.y += addy
+            self.rect.x += addx
+            self.rect.y += addy
             add = np.array([-addx,-addy],float)
             self.nest_dir=self.nest_dir+add
 
@@ -66,34 +60,25 @@ class Ant:
         self.direction %= 2*math.pi
     
     def show(self,screen):
-        pygame.draw.rect(screen, self.color, (self.x,self.y,self.width,self.length))
+        pygame.draw.rect(screen, self.color, self.rect)
     
     def __repr__(self):
-        return f'Ant({self.x},{self.y},{self.direction},{self.nest_dir})'
+        return f'Ant({self.rect.x},{self.rect.y},{self.sense_direction},{self.return_nest_count})'
         
     def nest_return(self):
-        if self.food_find==1 and self.return_nest_count==self.sense_direction:
+        if self.food_find==1 and self.return_nest_count>self.sense_direction:
             self.return_nest_count=0
             self.direction=angle(self.nest_dir,np.array([1,0],float))
-            if self.y>self.nest.y:
+            if self.rect.y>self.nest.rect.y:
                 self.direction*=-1
             self.direction%=2*math.pi
 
     def trace_nest_dir(self,screen):
-        pygame.draw.line(screen, (0,255,0), (self.x,self.y), (self.x+self.nest_dir[0],self.y+self.nest_dir[1]), 1)
+        pygame.draw.line(screen, (0,255,0), (self.rect.x,self.rect.y), (self.rect.x+self.nest_dir[0],self.rect.y+self.nest_dir[1]), 1)
     
     def trace_direction(self,screen):
-        pygame.draw.line(screen, (255,255,0), (self.x,self.y), (self.x+math.cos(self.direction)*20,self.y+math.sin(self.direction)*20), 1)
-    
-    def contact(self,rec):
-        if self.x>rec.x and self.x<rec.x+rec.width and self.y>rec.y and self.y<rec.y+rec.length and self.food_find==1:
-            return True
-        else:
-            return False
+        pygame.draw.line(screen, (255,255,0), (self.rect.x,self.rect.y), (self.rect.x+math.cos(self.direction)*20,self.rect.y+math.sin(self.direction)*20), 1)
         
     def contact_nest(self):
-        if self.x>self.nest.x and self.x<self.nest.x+self.nest.width and self.y>self.nest.y and self.y<self.nest.y+self.nest.length and self.food_find==1:
+        if self.rect.colliderect(self.nest.rect) and self.food_find==1:
             self.in_nest=1
-            return True
-        else:
-            return False
